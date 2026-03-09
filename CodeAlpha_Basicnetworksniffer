@@ -1,1 +1,353 @@
+# 🌐 Network Packet Sniffer & Analyzer
 
+A comprehensive Python application for capturing, analyzing, and understanding network traffic packets.
+
+## 📋 Features
+
+- ✅ **Real-time Packet Capture** - Live network traffic monitoring
+- ✅ **Detailed Packet Analysis** - Examine all packet layers (MAC, IP, TCP/UDP, Payload)
+- ✅ **Protocol Support** - TCP, UDP, ICMP, DNS, ARP, IPv6
+- ✅ **Statistical Analysis** - Protocol distribution, traffic patterns, port analysis
+- ✅ **Filtered Capture** - Focus on specific protocols or traffic types
+- ✅ **Interactive CLI** - User-friendly menu-driven interface
+- ✅ **BPF Filters** - Advanced filtering using Berkeley Packet Filters
+
+## 🛠️ Installation
+
+### Prerequisites
+- Python 3.7+
+- Root/Administrator privileges (required for packet capture)
+- pip (Python package manager)
+
+### Step 1: Clone or Download
+```bash
+# Download the project files to your directory
+cd network-packet-sniffer
+```
+
+### Step 2: Install Dependencies
+```bash
+# Install Scapy library
+pip install -r requirements.txt
+```
+
+Or install directly:
+```bash
+pip install scapy
+```
+
+### Step 3: Verify Installation
+```bash
+python3 -c "from scapy.all import sniff; print('Scapy installed successfully!')"
+```
+
+## 🚀 Quick Start
+
+### Using Interactive CLI (Recommended)
+```bash
+sudo python3 sniffer_cli.py
+```
+
+Then select from the menu:
+1. Basic Packet Sniffer
+2. Advanced Analyzer
+3. Filtered Sniffer
+4. Custom Sniffer
+
+### Direct Script Usage
+
+#### Basic Sniffer
+```bash
+sudo python3 packet_sniffer.py
+```
+
+Captures and displays all packets with full details.
+
+#### Advanced Analyzer
+```bash
+sudo python3 packet_analyzer.py
+```
+
+Analyzes 100 packets and generates statistics.
+
+#### Filtered Sniffer
+```bash
+sudo python3 filtered_sniffer.py
+```
+
+Edit the last line to select filter type:
+```python
+# sniffer = FilteredSniffer(filter_type='tcp', packet_count=10)
+# sniffer = FilteredSniffer(filter_type='dns', packet_count=10)
+# sniffer = FilteredSniffer(filter_type='http', packet_count=10)
+sniffer = FilteredSniffer(filter_type='all', packet_count=0)
+sniffer.start()
+```
+
+## 📊 Example Output
+
+### Basic Sniffer Output
+```
+[Packet #1] 14:23:45.123
+----------------------------------------------------------------------
+🔗 MAC Layer (Layer 2):
+   Source MAC:      aa:bb:cc:dd:ee:ff
+   Destination MAC: 11:22:33:44:55:66
+
+🌐 IP Layer (Layer 3):
+   Version:         4
+   Header Length:   20 bytes
+   TTL:             64
+   Total Length:    512 bytes
+   Source IP:       192.168.1.100
+   Destination IP:  8.8.8.8
+   Protocol:        TCP
+
+📤 TCP Layer (Layer 4):
+   Source Port:     54321
+   Destination Port: 443
+   Sequence Number: 1234567890
+   Flags:           PA
+
+📦 Payload:
+   Size:            256 bytes
+   Data (Hex):      170301000...
+```
+
+### Analyzer Statistics Output
+```
+======================================================================
+📈 PACKET ANALYSIS STATISTICS
+======================================================================
+
+Total Packets Captured: 100
+
+Protocol Distribution:
+  TCP                 45 packets ( 45.0%)
+  UDP                 30 packets ( 30.0%)
+  ICMP                15 packets ( 15.0%)
+
+Packet Size Statistics:
+  Average Size:    245.67 bytes
+  Minimum Size:    52 bytes
+  Maximum Size:    1514 bytes
+
+Top 5 Source IP Addresses:
+  192.168.1.1              25 packets ( 25.0%)
+  8.8.8.8                  15 packets ( 15.0%)
+  142.250.65.110           12 packets ( 12.0%)
+
+Top 10 Destination Ports:
+  Port 443   - TCP:  12, UDP:  0 (Total: 12)
+  Port 80    - TCP:   8, UDP:  0 (Total: 8)
+  Port 53    - TCP:   1, UDP:   6 (Total: 7)
+```
+
+## 🔍 BPF Filter Examples
+
+Berkeley Packet Filter (BPF) allows you to capture specific traffic:
+
+```bash
+# HTTP traffic
+tcp port 80
+
+# HTTPS traffic
+tcp port 443
+
+# DNS traffic
+udp port 53
+
+# Specific IP address
+host 192.168.1.1
+
+# Specific subnet
+src 192.168.1.0/24
+
+# Exclude ICMP
+not icmp
+
+# TCP traffic from specific host
+tcp and src 10.0.0.5
+
+# All traffic except localhost
+not host 127.0.0.1
+
+# Traffic on specific interface
+tcp port 22
+```
+
+## 📚 Understanding Packet Structure
+
+### OSI Model Layers
+
+```
+Layer 7: Application (HTTP, DNS, SSH, etc.)
+Layer 6: Presentation (Encryption, compression)
+Layer 5: Session (Connection management)
+Layer 4: Transport (TCP, UDP)
+Layer 3: Network (IP, ICMP)
+Layer 2: Data Link (Ethernet, MAC)
+Layer 1: Physical (Cables, signals)
+```
+
+### Typical Packet Flow
+
+```
+Ethernet Header (MAC addressing)
+    ↓
+IP Header (IPv4/IPv6 - routing)
+    ↓
+TCP/UDP Header (ports, control)
+    ↓
+Application Data (HTTP, DNS, etc.)
+    ↓
+Payload (the actual data)
+```
+
+### TCP Connection Sequence
+
+```
+Client                          Server
+  |                               |
+  |-------- SYN (port 443) -----→ |
+  |                               |
+  | ←---- SYN-ACK (port 54321) -- |
+  |                               |
+  |-------- ACK ---------------→ |
+  |                               |
+  | ←----- Data Exchange ------→ |
+  |                               |
+  |-------- FIN ---------------→ |
+  |                               |
+  | ←----- FIN-ACK ------------- |
+  |                               |
+```
+
+## 🔧 Customization
+
+### Monitor Specific Interface
+Edit any script to specify an interface:
+```python
+sniffer = PacketSniffer(interface="eth0")
+```
+
+List available interfaces:
+```bash
+python3 -c "from scapy.all import get_if_list; print(get_if_list())"
+```
+
+### Modify Display Output
+Edit the `display_*` methods in `packet_sniffer.py` to customize output.
+
+### Add Protocol Support
+Extend the `display_transport_info()` method to handle additional protocols:
+```python
+from scapy.all import IP, IGMP
+
+if IGMP in packet:
+    igmp_layer = packet[IGMP]
+    print(f"IGMP Type: {igmp_layer.type}")
+```
+
+## ⚠️ Important Notes
+
+### Requirements
+- **Root/Administrator Privileges**: Packet sniffing requires elevated privileges
+  - Linux/Mac: Use `sudo python3 script.py`
+  - Windows: Run Command Prompt as Administrator
+
+### Ethical Use
+- Only capture traffic on networks you own or have permission to monitor
+- Capturing traffic on others' networks without permission is illegal
+- Use for learning, debugging, and authorized network analysis only
+
+### Performance
+- Capturing on high-traffic networks may impact performance
+- Use filters to reduce data volume
+- Set reasonable packet counts for analysis
+
+## 🐛 Troubleshooting
+
+### "Permission denied" error
+```bash
+# Run with sudo
+sudo python3 sniffer_cli.py
+```
+
+### "No module named scapy"
+```bash
+# Install Scapy
+pip install scapy
+```
+
+### No packets captured
+- Check network interface is active: `ifconfig` (Linux/Mac) or `ipconfig` (Windows)
+- Ensure packets are being generated (browse websites, ping, etc.)
+- Try specifying interface explicitly
+
+### Windows-specific issues
+- Install Npcap (replaces WinPcap): https://nmap.org/npcap/
+- Run Python as Administrator
+- May need Visual C++ Build Tools
+
+## 📖 Learning Resources
+
+- [Scapy Documentation](https://scapy.readthedocs.io/)
+- [OSI Model Explained](https://en.wikipedia.org/wiki/OSI_model)
+- [TCP/IP Protocol Suite](https://en.wikipedia.org/wiki/Internet_protocol_suite)
+- [Wireshark](https://www.wireshark.org/) - GUI packet analyzer
+- [tcpdump](https://www.tcpdump.org/) - Command-line packet capture
+
+## 🎓 Learning Paths
+
+### Beginner
+1. Run interactive CLI
+2. Capture a few packets with basic sniffer
+3. Understand packet layers (MAC → IP → TCP/UDP → Data)
+4. Try different filters
+
+### Intermediate
+1. Analyze HTTP/HTTPS traffic
+2. Monitor DNS queries
+3. Generate statistics on real traffic
+4. Create custom BPF filters
+
+### Advanced
+1. Add new protocol support
+2. Create packet capture files (pcap)
+3. Integrate with external tools
+4. Build real-time monitoring dashboard
+
+## 📝 Examples
+
+### Example 1: Capture 50 packets
+```bash
+sudo python3 packet_sniffer.py
+# Then modify PACKET_COUNT = 50
+```
+
+### Example 2: Analyze HTTPS traffic only
+```bash
+# Edit packet_sniffer.py
+FILTER = "tcp port 443"
+```
+
+### Example 3: Monitor specific IP
+```bash
+# Edit packet_sniffer.py
+FILTER = "host 192.168.1.100"
+```
+
+## 📄 License
+
+This project is for educational purposes.
+
+## 🤝 Contributing
+
+Feel free to extend and customize these scripts:
+- Add more protocol support
+- Create visualization dashboards
+- Add packet capture to pcap files
+- Build REST API interface
+
+---
